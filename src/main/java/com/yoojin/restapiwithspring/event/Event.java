@@ -2,6 +2,7 @@ package com.yoojin.restapiwithspring.event;
 
 import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -10,10 +11,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Builder
+@Entity
 public class Event {
+    @Id @GeneratedValue
     private Integer id;
     private Boolean offline;
     private boolean free;
+    @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
     private String name;
     private String description;
