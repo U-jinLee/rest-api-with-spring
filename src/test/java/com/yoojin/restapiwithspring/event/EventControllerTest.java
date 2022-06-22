@@ -34,7 +34,7 @@ public class EventControllerTest {
     @Test
     public void createEvent() throws Exception {
 
-        Event event = Event.builder()
+        EventDto event = EventDto.builder()
                 .name("Spring")
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2020, 06, 03, 10, 30))
@@ -45,7 +45,6 @@ public class EventControllerTest {
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역")
-                .eventStatus(EventStatus.PUBLISHED)
                 .build();
 
 
@@ -61,5 +60,33 @@ public class EventControllerTest {
                 .andExpect(jsonPath("id").value(Matchers.not(100)))
                 .andExpect(jsonPath("free").value(Matchers.not(true)))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
+    }
+    @Test
+    public void createEvent_bad_request() throws Exception {
+
+        Event event = Event.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2020, 06, 03, 10, 30))
+                .closeEnrollmentDateTime(LocalDateTime.of(2020, 07, 03, 10, 30))
+                .beginEventDateTime(LocalDateTime.of(2020, 06, 03, 10, 30))
+                .endEventDateTime(LocalDateTime.of(2020, 07, 03, 10, 30))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역")
+                .free(true)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
+                .build();
+
+
+        mockMvc.perform(post("/api/events/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(event))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }
