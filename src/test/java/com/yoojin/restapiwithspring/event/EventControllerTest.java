@@ -1,6 +1,7 @@
 package com.yoojin.restapiwithspring.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yoojin.restapiwithspring.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ public class EventControllerTest {
     EventRepository eventRepository;
 
     @Test
+    @TestDescription("정상적으로 이벤트 생성하는 테스트")
     public void createEvent() throws Exception {
 
         EventDto event = EventDto.builder()
@@ -111,7 +113,7 @@ public class EventControllerTest {
                 .beginEnrollmentDateTime(LocalDateTime.of(2020, 06, 03, 10, 30))
                 .closeEnrollmentDateTime(LocalDateTime.of(2020, 07, 03, 10, 30))
                 .beginEventDateTime(LocalDateTime.of(2020, 06, 03, 10, 30))
-                .endEventDateTime(LocalDateTime.of(2020, 07, 03, 10, 30))
+                .endEventDateTime(LocalDateTime.of(2020, 07, 02, 10, 30))
                 .basePrice(10000)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
@@ -122,6 +124,12 @@ public class EventControllerTest {
         mockMvc.perform(post("/api/events/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventDto)))
-                .andExpect(status().isBadRequest());
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+        ;
+
     }
 }
