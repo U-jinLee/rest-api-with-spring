@@ -49,7 +49,6 @@ public class EventControllerTest {
                 .location("강남역")
                 .build();
 
-
         mockMvc.perform(post("/api/events/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaTypes.HAL_JSON)
@@ -62,11 +61,14 @@ public class EventControllerTest {
                 .andExpect(jsonPath("id").value(Matchers.not(100)))
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
-                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()));
+                .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query-event").exists())
+                .andExpect(jsonPath("_links.update-event").exists());
     }
+
     @Test
     public void createEvent_bad_request() throws Exception {
-
         Event event = Event.builder()
                 .name("Spring")
                 .description("REST API Development with Spring")
