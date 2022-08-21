@@ -38,7 +38,7 @@ public class EventController {
 //        PagedModel<EntityModel<Event>> pagedModel = assembler.toModel(events);
         return ResponseEntity.status(HttpStatus.OK).body(events);
     }
-    @Transactional
+
     @PostMapping("")
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if(errors.hasErrors()) {
@@ -52,13 +52,12 @@ public class EventController {
 
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
-        Event newEvent = eventRepository.save(event);
-        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(event.getId());
+        Event newEvent = this.eventRepository.save(event);
+        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
         URI createdUri = selfLinkBuilder.toUri();
-        EventResource eventResource = new EventResource(newEvent);
-        eventResource.add(linkTo(EventController.class).withRel("query-event"));
-        eventResource.add(selfLinkBuilder.withSelfRel());
-        eventResource.add(selfLinkBuilder.withSelfRel().withRel("update-event"));
+        EventResource eventResource = new EventResource(event);
+        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        eventResource.add(selfLinkBuilder.withSelfRel().withRel("update"));
         return ResponseEntity.created(createdUri).body(eventResource);
     }
 

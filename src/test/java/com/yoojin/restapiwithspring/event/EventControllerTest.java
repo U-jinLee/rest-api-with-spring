@@ -3,6 +3,7 @@ package com.yoojin.restapiwithspring.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoojin.restapiwithspring.common.TestDescription;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 
@@ -26,12 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
+@Ignore
 public class EventControllerTest {
 
-    @Autowired MockMvc mockMvc;
-    @Autowired ObjectMapper objectMapper;
+    @Autowired protected MockMvc mockMvc;
+    @Autowired protected ObjectMapper objectMapper;
 
-    @MockBean
+    @Autowired
     EventRepository eventRepository;
 
     @Test
@@ -58,15 +62,15 @@ public class EventControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").exists())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
                 .andExpect(jsonPath("_links.self").exists())
-                .andExpect(jsonPath("_links.query-event").exists())
-                .andExpect(jsonPath("_links.update-event").exists());
+                .andExpect(jsonPath("_links.query-events").exists())
+                .andExpect(jsonPath("_links.update").exists());
     }
 
     @Test
