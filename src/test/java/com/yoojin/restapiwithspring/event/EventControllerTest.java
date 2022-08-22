@@ -21,7 +21,11 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -76,7 +80,54 @@ public class EventControllerTest {
                 .andExpect(jsonPath("_links.query-events").exists())
                 .andExpect(jsonPath("_links.update").exists())
                 //문서의 제목 추가
-                .andDo(document("create-event"));
+                .andDo(document("create-event",
+                        links(
+                                linkWithRel("self").description("link to self"),
+                                linkWithRel("query-events").description("link to query event"),
+                                linkWithRel("update").description("link to update")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("Name of new Event"),
+                                fieldWithPath("description").description("Description of new Event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("BeginEnrollmentDateTime of new Event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("CloseEnrollmentDateTime of new Event"),
+                                fieldWithPath("beginEventDateTime").description("BeginEventDateTime of new Event"),
+                                fieldWithPath("endEventDateTime").description("EndEventDateTime of new Event"),
+                                fieldWithPath("location").description("Location of new Event"),
+                                fieldWithPath("basePrice").description("BasePrice of new Event"),
+                                fieldWithPath("maxPrice").description("MaxPrice of new Event"),
+                                fieldWithPath("limitOfEnrollment").description("LimitOfEnrollment of new Event")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("Location"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("id of new Event"),
+                                fieldWithPath("name").description("Name of new Event"),
+                                fieldWithPath("description").description("Description of new Event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("BeginEnrollmentDateTime of new Event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("CloseEnrollmentDateTime of new Event"),
+                                fieldWithPath("beginEventDateTime").description("BeginEventDateTime of new Event"),
+                                fieldWithPath("endEventDateTime").description("EndEventDateTime of new Event"),
+                                fieldWithPath("location").description("Location of new Event"),
+                                fieldWithPath("basePrice").description("BasePrice of new Event"),
+                                fieldWithPath("maxPrice").description("MaxPrice of new Event"),
+                                fieldWithPath("limitOfEnrollment").description("LimitOfEnrollment of new Event"),
+                                fieldWithPath("free").description("free of new Event"),
+                                fieldWithPath("offline").description("offline of new Event"),
+                                fieldWithPath("eventStatus").description("eventStatus of new Event"),
+                                /**Response field 있지만 무시하고 싶은 값**/
+                                fieldWithPath("_links.*").ignored(),
+                                fieldWithPath("_links.self.*").ignored(),
+                                fieldWithPath("_links.query-events.*").ignored(),
+                                fieldWithPath("_links.update.*").ignored()
+                        )
+                        ));
 
     }
 
