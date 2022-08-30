@@ -79,12 +79,14 @@ public class EventControllerTest {
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.query-events").exists())
                 .andExpect(jsonPath("_links.update").exists())
+                .andExpect(jsonPath("_links.profile").exists())
                 //문서의 제목 추가
                 .andDo(document("create-event",
                         links(
                                 linkWithRel("self").description("link to self"),
                                 linkWithRel("query-events").description("link to query event"),
-                                linkWithRel("update").description("link to update")
+                                linkWithRel("update").description("link to update"),
+                                linkWithRel("profile").description("link to profile")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header"),
@@ -125,7 +127,8 @@ public class EventControllerTest {
                                 fieldWithPath("_links.*").ignored(),
                                 fieldWithPath("_links.self.*").ignored(),
                                 fieldWithPath("_links.query-events.*").ignored(),
-                                fieldWithPath("_links.update.*").ignored()
+                                fieldWithPath("_links.update.*").ignored(),
+                                fieldWithPath("_links.profile.href").ignored()
                         )
                         ));
 
