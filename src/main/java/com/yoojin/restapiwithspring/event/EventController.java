@@ -1,12 +1,15 @@
 package com.yoojin.restapiwithspring.event;
 
+import com.yoojin.restapiwithspring.common.ErrorsResource;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,23 +35,25 @@ public class EventController {
     private final ModelMapper modelMapper;
     private final EventValidator eventValidator;
 
+
     @Transactional(readOnly = true)
-    @GetMapping()
-    public ResponseEntity getEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
-        Page<Event> events = eventRepository.findAll(pageable);
-//        PagedModel<EntityModel<Event>> pagedModel = assembler.toModel(events);
-        return ResponseEntity.status(HttpStatus.OK).body(events);
+    @GetMapping("")
+    public ResponseEntity getEvents(Pageable pageable, PagedResourcesAssembler assembler) {
+        Page<Event> events = this.eventRepository.findAll(pageable);
+        PagedModel<EntityModel<Event>> pagedModel = assembler.toModel(events, e -> new EventResource((Event) e));
+        pagedModel.add(Link.of("/docs/index.html#resource-events-list").withRel("profile"));
+        return ResponseEntity.status(HttpStatus.OK).body(pagedModel);
     }
 
     @PostMapping("")
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(new ErrorsResource(errors));
         }
 
         eventValidator.validate(eventDto, errors);
         if(errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(new ErrorsResource(errors));
         }
 
         Event event = modelMapper.map(eventDto, Event.class);

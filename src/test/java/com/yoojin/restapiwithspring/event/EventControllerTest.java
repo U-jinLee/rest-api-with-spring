@@ -198,30 +198,38 @@ public class EventControllerTest {
                 .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$[0].objectName").exists())
-                .andExpect(jsonPath("$[0].defaultMessage").exists())
-                .andExpect(jsonPath("$[0].code").exists())
-        ;
+                .andExpect(jsonPath("errors[0].objectName").exists())
+                .andExpect(jsonPath("errors[0].defaultMessage").exists())
+                .andExpect(jsonPath("errors[0].code").exists())
+                .andExpect(jsonPath("_links.index").exists());
 
     }
 
     @Test
-    @TestDescription("30개의 페이지를 10개씩 두번 째 페이지 조회")
+    @TestDescription("30개의 이벤트를 10개 씩 두번 째 페이지 조회")
     public void queryEvents() throws Exception {
+        //given
         IntStream.range(0, 30).forEach(this::generateEvent);
-
+        //when
         this.mockMvc.perform(get("/api/events")
                         .param("page", "1")
                         .param("size", "10")
                         .param("sort", "name,DESC")
                 )
+                //then
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_embedded.eventList[0]._links.self").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("query_events"));
+
     }
 
     private void generateEvent(int index) {
         Event event = Event.builder()
-                .name("event"+index)
+                .name("event "+index)
                 .description("test event")
                 .build();
         this.eventRepository.save(event);
