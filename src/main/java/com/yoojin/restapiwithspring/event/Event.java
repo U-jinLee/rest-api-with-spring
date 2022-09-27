@@ -1,5 +1,6 @@
 package com.yoojin.restapiwithspring.event;
 
+import com.yoojin.restapiwithspring.account.Account;
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,6 +30,8 @@ public class Event {
     private int basePrice;
     private int maxPrice;
     private int limitOfEnrollment;
+    @ManyToOne
+    private Account manager;
 
     public void update() {
         // Update free
