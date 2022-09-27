@@ -227,11 +227,37 @@ public class EventControllerTest {
 
     }
 
-    private void generateEvent(int index) {
+    @Test
+    @TestDescription("기존의 이벤트 하나를 조회하기")
+    public void getEvent() throws Exception {
+        //given
+        Event event = this.generateEvent(100);
+        //when & then
+        this.mockMvc.perform(get("/api/events/{id}", event.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+        ;
+    }
+
+    @Test
+    @TestDescription("없는 이벤트 조회 시 404 에러 반환하기")
+    public void getEvent_404() throws Exception {
+        //given
+        Event event = this.generateEvent(100);
+        //when & then
+        this.mockMvc.perform(get("/api/events/3999999"))
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    private Event generateEvent(int index) {
         Event event = Event.builder()
                 .name("event "+index)
                 .description("test event")
                 .build();
-        this.eventRepository.save(event);
+        return this.eventRepository.save(event);
     }
 }
