@@ -1,10 +1,8 @@
 package com.yoojin.restapiwithspring;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class RestApiWithSpringApplicationTests {
+class RestApiWithSpringApplicationTests extends BaseControllerTest {
 
 	@Test
 	void contextLoads() {
